@@ -1,7 +1,7 @@
 // Confess Your Worst Moment entry.
 // Deterministic program: writes one fixed confession line to entry.txt.
 // No network access, no randomness, no external input.
-import { mkdirSync, writeFileSync } from "node:fs";
+import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 
 const CONFESSION =
@@ -17,4 +17,14 @@ function resolveOutputDir(): string {
 
 const dir = resolveOutputDir();
 mkdirSync(dir, { recursive: true });
-writeFileSync(join(dir, "entry.txt"), CONFESSION, "utf8");
+const entryPath = join(dir, "entry.txt");
+writeFileSync(entryPath, CONFESSION, "utf8");
+
+// Verify after write: read the file back and assert it matches exactly.
+const written = readFileSync(entryPath, "utf8");
+if (written !== CONFESSION) {
+  console.error(
+    `Verification failed: entry.txt content does not match the expected line.`,
+  );
+  process.exit(1);
+}
